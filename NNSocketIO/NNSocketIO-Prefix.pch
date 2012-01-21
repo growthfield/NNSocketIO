@@ -1,0 +1,7 @@
+//
+// Prefix header for all source files of the 'NNSocketIO' target in the 'NNSocketIO' project
+//
+
+#ifdef __OBJC__
+    #import <Foundation/Foundation.h>
+#endif

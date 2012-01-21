@@ -1,0 +1,12 @@
+[submodule "vendor/NNUtil"]
+	path = vendor/NNUtil
+	url = git@github.com:growthfield/NNUtil.git
+[submodule "vendor/JSONKit"]
+	path = vendor/JSONKit
+	url = https://github.com/johnezang/JSONKit.git
+[submodule "vendor/CocoaAsyncSocket"]
+	path = vendor/CocoaAsyncSocket
+	url = https://github.com/robbiehanson/CocoaAsyncSocket.git
+[submodule "vendor/NNWebSocket"]
+	path = vendor/NNWebSocket
+	url = git@github.com:growthfield/NNWebSocket.git
