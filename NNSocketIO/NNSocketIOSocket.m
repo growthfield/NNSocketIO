@@ -9,11 +9,12 @@
 #define SHARED_STATE_METHOD() \
 + (NNSocketIOSocketState*)sharedState \
 { \
-static id instance_ = nil; \
-if (!instance_) { \
-instance_ = [[self alloc] init]; \
-} \
-return instance_; \
+    static id instance_ = nil; \
+    static dispatch_once_t once; \
+    dispatch_once(&once, ^{ \
+        instance_ = [[self alloc] init]; \
+    }); \
+    return instance_; \
 }
 
 // NNSocketIOSocket =================================================
