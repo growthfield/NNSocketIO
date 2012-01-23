@@ -434,8 +434,7 @@ SHARED_STATE_METHOD();
     }
     [ctx.sendPacketBuffer removeAllObjects];
 }
-- (void)didClose:(NNSocketIOSocket*)ctx error:(NSError*)error
-{
+- (void)didClose:(NNSocketIOSocket*)ctx clientInitiated:(BOOL)clientInitiated error:(NSError*)error;{
     TRACE();
     [self reconnect:ctx error:error];
 }
@@ -491,7 +490,7 @@ SHARED_STATE_METHOD();
     frame.payloadString = packetString;
     [ctx.websocket send:frame];
 }
-- (void)didClose:(NNSocketIOSocket*)ctx error:(NSError*)error
+- (void)didClose:(NNSocketIOSocket*)ctx clientInitiated:(BOOL)clientInitiated error:(NSError*)error;
 {
     TRACE();
     [ctx changeState:[NNSocketIOSocketStateDisconnected sharedState]];

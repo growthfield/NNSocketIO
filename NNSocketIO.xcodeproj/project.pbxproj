@@ -13,12 +13,11 @@
 		402B7A56147D208E002E6EC1 /* NNSocketIOSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 402B7A54147D208E002E6EC1 /* NNSocketIOSocket.m */; };
 		404715A9147886D800963535 /* NNSocketIOParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 404715A7147886D800963535 /* NNSocketIOParser.h */; };
 		404715AA147886D800963535 /* NNSocketIOParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 404715A8147886D800963535 /* NNSocketIOParser.m */; };
-		404A3E3F148AF09C00CAAF19 /* NNSocketIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 409D9B6A14418276009F2852 /* NNSocketIO.h */; };
-		40520A0E14C155E900CAF5FA /* NNWebSocketOptions.h in Headers */ = {isa = PBXBuildFile; fileRef = 40520A0C14C155E900CAF5FA /* NNWebSocketOptions.h */; };
+		404A3E3F148AF09C00CAAF19 /* NNSocketIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 409D9B6A14418276009F2852 /* NNSocketIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		40520A0F14C155E900CAF5FA /* NNWebSocketOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 40520A0D14C155E900CAF5FA /* NNWebSocketOptions.m */; };
 		40599E021481BB1600A2EFA2 /* NNSocketIONamespace.h in Headers */ = {isa = PBXBuildFile; fileRef = 40599E001481BB1600A2EFA2 /* NNSocketIONamespace.h */; };
 		40599E031481BB1600A2EFA2 /* NNSocketIONamespace.m in Sources */ = {isa = PBXBuildFile; fileRef = 40599E011481BB1600A2EFA2 /* NNSocketIONamespace.m */; };
-		40599E061481C6B700A2EFA2 /* NNSocketIOOptions.h in Headers */ = {isa = PBXBuildFile; fileRef = 40599E041481C6B700A2EFA2 /* NNSocketIOOptions.h */; };
+		40599E061481C6B700A2EFA2 /* NNSocketIOOptions.h in Headers */ = {isa = PBXBuildFile; fileRef = 40599E041481C6B700A2EFA2 /* NNSocketIOOptions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		40599E071481C6B700A2EFA2 /* NNSocketIOOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 40599E051481C6B700A2EFA2 /* NNSocketIOOptions.m */; };
 		409D9B6614418276009F2852 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 409D9B6514418276009F2852 /* Foundation.framework */; };
 		409D9B6C14418276009F2852 /* NNSocketIO.m in Sources */ = {isa = PBXBuildFile; fileRef = 409D9B6B14418276009F2852 /* NNSocketIO.m */; };
@@ -109,15 +108,16 @@
 		409D9C9A14426B51009F2852 /* NNSocketIOSpec.m in Sources */ = {isa = PBXBuildFile; fileRef = 409D9C9914426B51009F2852 /* NNSocketIOSpec.m */; };
 		409D9C9C14426D1F009F2852 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 409D9C9B14426D1F009F2852 /* CFNetwork.framework */; };
 		40BB883E14CB66130025A89A /* NNSocketIODebug.h in Headers */ = {isa = PBXBuildFile; fileRef = 40BB883D14CB66130025A89A /* NNSocketIODebug.h */; };
-		40DA09EE14AE22360082D0DC /* NNEventEmitter.h in Headers */ = {isa = PBXBuildFile; fileRef = 40DA09EA14AE22360082D0DC /* NNEventEmitter.h */; };
+		40DA09EE14AE22360082D0DC /* NNEventEmitter.h in Headers */ = {isa = PBXBuildFile; fileRef = 40DA09EA14AE22360082D0DC /* NNEventEmitter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		40DA09EF14AE22360082D0DC /* NNEventEmitter.m in Sources */ = {isa = PBXBuildFile; fileRef = 40DA09EB14AE22360082D0DC /* NNEventEmitter.m */; };
 		40F754BE14B79DB10044A17D /* NSString+NNUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 40F754BA14B79DB10044A17D /* NSString+NNUtil.h */; };
 		40F754BF14B79DB10044A17D /* NSString+NNUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 40F754BB14B79DB10044A17D /* NSString+NNUtil.m */; };
 		40F754C014B79DB10044A17D /* NSTimer+NNUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 40F754BC14B79DB10044A17D /* NSTimer+NNUtil.h */; };
 		40F754C114B79DB10044A17D /* NSTimer+NNUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 40F754BD14B79DB10044A17D /* NSTimer+NNUtil.m */; };
-		40F754CC14B9527C0044A17D /* NNSocketIOClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 40F754CB14B9527B0044A17D /* NNSocketIOClient.h */; };
-		40FAB2EA14B3A3BC00760982 /* NNArgs.h in Headers */ = {isa = PBXBuildFile; fileRef = 40FAB2E814B3A3BB00760982 /* NNArgs.h */; };
+		40F754CC14B9527C0044A17D /* NNSocketIOClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 40F754CB14B9527B0044A17D /* NNSocketIOClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		40FAB2EA14B3A3BC00760982 /* NNArgs.h in Headers */ = {isa = PBXBuildFile; fileRef = 40FAB2E814B3A3BB00760982 /* NNArgs.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		40FAB2EB14B3A3BC00760982 /* NNArgs.m in Sources */ = {isa = PBXBuildFile; fileRef = 40FAB2E914B3A3BC00760982 /* NNArgs.m */; };
+		40FFD4BD14CCE6DE008244C6 /* NNWebSocketOptions.h in Headers */ = {isa = PBXBuildFile; fileRef = 40520A0C14C155E900CAF5FA /* NNWebSocketOptions.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -660,6 +660,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				404A3E3F148AF09C00CAAF19 /* NNSocketIO.h in Headers */,
+				40F754CC14B9527C0044A17D /* NNSocketIOClient.h in Headers */,
+				40599E061481C6B700A2EFA2 /* NNSocketIOOptions.h in Headers */,
+				40FAB2EA14B3A3BC00760982 /* NNArgs.h in Headers */,
+				40DA09EE14AE22360082D0DC /* NNEventEmitter.h in Headers */,
+				40FFD4BD14CCE6DE008244C6 /* NNWebSocketOptions.h in Headers */,
 				409D9B9F14418C00009F2852 /* NNBase64.h in Headers */,
 				409D9BA114418C00009F2852 /* NNDebug.h in Headers */,
 				409D9BA814418C24009F2852 /* NNWebSocket.h in Headers */,
@@ -669,14 +674,9 @@
 				404715A9147886D800963535 /* NNSocketIOParser.h in Headers */,
 				402B7A55147D208E002E6EC1 /* NNSocketIOSocket.h in Headers */,
 				40599E021481BB1600A2EFA2 /* NNSocketIONamespace.h in Headers */,
-				40599E061481C6B700A2EFA2 /* NNSocketIOOptions.h in Headers */,
 				4002262214A973E700545D2C /* GCDAsyncSocket.h in Headers */,
-				40DA09EE14AE22360082D0DC /* NNEventEmitter.h in Headers */,
-				40FAB2EA14B3A3BC00760982 /* NNArgs.h in Headers */,
 				40F754BE14B79DB10044A17D /* NSString+NNUtil.h in Headers */,
 				40F754C014B79DB10044A17D /* NSTimer+NNUtil.h in Headers */,
-				40F754CC14B9527C0044A17D /* NNSocketIOClient.h in Headers */,
-				40520A0E14C155E900CAF5FA /* NNWebSocketOptions.h in Headers */,
 				40BB883E14CB66130025A89A /* NNSocketIODebug.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
