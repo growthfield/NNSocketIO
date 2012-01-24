@@ -14,7 +14,7 @@
     BOOL connectionRecovery;
     NSUInteger connectionRecoveryAttempts_;
     NSDictionary* tlsSettings_;
-
+    BOOL enableBackgroundingOnSocket_;
 }
 @property(nonatomic, retain) NSString* resource;
 @property(nonatomic, assign) NSUInteger protocolVersion;
@@ -26,5 +26,6 @@
 @property(nonatomic, assign) BOOL connectionRecovery;
 @property(nonatomic, assign) NSUInteger connectionRecoveryAttempts;
 @property(nonatomic, retain) NSDictionary* tlsSettings;
+@property(nonatomic, assign) BOOL enableBackgroundingOnSocket;
 + (id)options;
 @end

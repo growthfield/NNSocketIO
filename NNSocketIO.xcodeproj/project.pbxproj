@@ -942,6 +942,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "NNSocketIO/NNSocketIO-Prefix.pch";
 				"GCC_PREPROCESSOR_DEFINITIONS[arch=*]" = (
+					"NNWEBSOCKET_DEBUG_LOG=1",
 					"$(inherited)",
 					"NNSOCKETIO_DEBUG_LOG=1",
 				);

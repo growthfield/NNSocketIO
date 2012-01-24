@@ -160,6 +160,7 @@
     [u appendFormat:@"websocket/%@/", sessionId];
     NSURL* url = [NSURL URLWithString:u];
     NNWebSocketOptions* wsopts = [NNWebSocketOptions options];
+    wsopts.enableBackgroundingOnSocket = self.options.enableBackgroundingOnSocket;
     wsopts.tlsSettings = self.options.tlsSettings;
     NNWebSocket* websocket = [[[NNWebSocket alloc] initWithURL:url origin:nil protocols:nil options:wsopts] autorelease];
     self.websocket = websocket;
