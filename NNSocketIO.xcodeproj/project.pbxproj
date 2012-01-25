@@ -944,7 +944,7 @@
 				"GCC_PREPROCESSOR_DEFINITIONS[arch=*]" = (
 					"NNWEBSOCKET_DEBUG_LOG=1",
 					"$(inherited)",
-					"NNSOCKETIO_DEBUG_LOG=1",
+					"NNSOCKETIO_DEBUG_TRACE=1",
 				);
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				OTHER_LDFLAGS = "-ObjC";

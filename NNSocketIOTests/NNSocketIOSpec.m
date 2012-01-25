@@ -7,7 +7,7 @@ describe(@"NNSocketIO", ^{
     
     NSNumber* Yes = [NSNumber numberWithBool:YES];
     NSNumber* No = [NSNumber numberWithBool:NO];
-
+    
     context(@"when client connects via http to", ^{
         __block NNSocketIO* io = nil;
         __block NNSocketIOOptions* opts = nil;
@@ -64,30 +64,6 @@ describe(@"NNSocketIO", ^{
             [[theObject(&onConnect2) shouldEventuallyBeforeTimingOutAfter(3.0)] beYes];
         });
     });
-    /*
-    context(@"when client connects via https to", ^{
-        __block NNSocketIO* io = nil;
-        __block NNSocketIOOptions* opts = nil;
-        __block NSNumber* onConnect = nil;
-        beforeEach(^{
-            onConnect = No;
-            opts = [NNSocketIOOptions options];
-            opts.retry = NO;
-            io = [NNSocketIO io];
-        });
-        it(@"root namespace, connect event should be emitted", ^{
-            NSURL* url = [NSURL URLWithString:@"https://localhost:8443"];
-            NSMutableDictionary* tlsSettings = [NSMutableDictionary dictionary];
-            [tlsSettings setObject:[NSNumber numberWithBool:YES] forKey:(NSString*)kCFStreamSSLAllowsAnyRoot];
-            opts.tlsSettings = tlsSettings;
-            id<NNSocketIOClient> root = [io connect:url options:opts];
-            [root on:@"connect" listener:^(NNArgs* args) {
-                onConnect = Yes;
-            }];
-            [[theObject(&onConnect) shouldEventuallyBeforeTimingOutAfter(3.0)] beYes];
-        });
-    });
-     */
     context(@"when retry disabled and client can't connect to", ^{
         __block NNSocketIO* io = nil;
         __block NNSocketIOOptions* opts = nil;
@@ -210,7 +186,6 @@ describe(@"NNSocketIO", ^{
             [[onConnect2 should] equal:No];
         });
     });
-     
     context(@"when retry enabled and client can't connect to", ^{
         __block NNSocketIO* io = nil;
         __block NNSocketIOOptions* opts = nil;
@@ -333,7 +308,6 @@ describe(@"NNSocketIO", ^{
             [[onConnect2 should] equal:No];
         });
     });
-
     context(@"when client disconnects", ^{
         __block NNSocketIO* io = nil;
         __block NNSocketIOOptions* opts = nil;
@@ -423,7 +397,6 @@ describe(@"NNSocketIO", ^{
             [[theObject(&onDisconnectOther) shouldEventuallyBeforeTimingOutAfter(3.0)] beYes];
         });
     });
-
     context(@"when server disconnects", ^{
         __block NNSocketIO* io = nil;
         __block NNSocketIOOptions* opts = nil;
@@ -484,7 +457,6 @@ describe(@"NNSocketIO", ^{
         });
          
     });
-    
     context(@"message", ^{
         __block id<NNSocketIOClient> ch = nil;
         __block NSNumber* isConnected = nil;
@@ -562,7 +534,6 @@ describe(@"NNSocketIO", ^{
             [[theObject(&receiveData) shouldEventuallyBeforeTimingOutAfter(3.0)] beNonNil];
         });
     });
-    
     context(@"client ack message", ^{
         __block id<NNSocketIOClient> ch = nil;
         __block NSNumber* isConnected = nil;
@@ -601,7 +572,6 @@ describe(@"NNSocketIO", ^{
 
         });
     });
-
     context(@"json", ^{
         __block id<NNSocketIOClient> ch = nil;
         __block NSNumber* isConnected = nil;
@@ -693,7 +663,6 @@ describe(@"NNSocketIO", ^{
             [[theObject(&isConnected) shouldEventuallyBeforeTimingOutAfter(3.0)] beYes];
             [[theObject(&receiveData) shouldEventuallyBeforeTimingOutAfter(3.0)] beNonNil];
         });
-        
         it(@"JSON object should be sent and got ack json", ^{
             NSDictionary* profile = [NSDictionary dictionaryWithObjectsAndKeys:@"taro", @"name", [NSNumber numberWithInt:20], @"age",nil];
             NSDictionary* welcome = [NSDictionary dictionaryWithObjectsAndKeys:@"taro", @"hello", nil];
@@ -707,7 +676,6 @@ describe(@"NNSocketIO", ^{
             [[theObject(&isConnected) shouldEventuallyBeforeTimingOutAfter(3.0)] beYes];
             [[theObject(&receiveData) shouldEventuallyBeforeTimingOutAfter(3.0)] beNonNil];            
         });
-        
         it(@"JSON array should be sent and got response event", ^{
             NSString* tweet = @"hello!";
             [ch on:@"connect" listener:^(NNArgs* args) {
@@ -722,7 +690,6 @@ describe(@"NNSocketIO", ^{
             [[theObject(&isConnected) shouldEventuallyBeforeTimingOutAfter(3.0)] beYes];
             [[theObject(&receiveData) shouldEventuallyBeforeTimingOutAfter(3.0)] beNonNil];            
         });
-        
         it(@"JSON array should be sent and got got ack json", ^{
             NSString* tweet = @"hello!";
             [ch on:@"connect" listener:^(NNArgs* args) {
@@ -736,7 +703,6 @@ describe(@"NNSocketIO", ^{
             [[theObject(&isConnected) shouldEventuallyBeforeTimingOutAfter(3.0)] beYes];
             [[theObject(&receiveData) shouldEventuallyBeforeTimingOutAfter(3.0)] beNonNil];            
         });
-        
     });
     context(@"client ack event", ^{
         __block id<NNSocketIOClient> ch = nil;
@@ -819,7 +785,6 @@ describe(@"NNSocketIO", ^{
             [[theObject(&onConnect) shouldEventuallyBeforeTimingOutAfter(3.0)] beYes];
             [[onConnectFailed should] equal:No];
         });
-
         it(@"namespace authorization should be failed", ^{
             NSURL* url = [NSURL URLWithString:@"http://localhost:8080/auth_error"];
             id<NNSocketIOClient> nsp = [io connect:url options:opts];

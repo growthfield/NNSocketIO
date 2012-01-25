@@ -26,7 +26,6 @@
 @property(nonatomic, assign) NSUInteger retryAttempts;
 @property(nonatomic, assign) NSUInteger connectionRecoveryAttempts;
 @property(nonatomic, retain) NSMutableArray* sendPacketBuffer;
-@property(nonatomic, retain) NSTimer* retryTimer;
 - (void)connect;
 - (void)publish:(NSString*) eventName;
 - (void)publish:(NSString*) eventName args:(NNArgs*)args;
@@ -81,7 +80,6 @@
 @synthesize retryAttempts = retryAttempts_;
 @synthesize connectionRecoveryAttempts = connectionRecoveryAttempts_;
 @synthesize sendPacketBuffer = sendPacketBuffer_;
-@synthesize retryTimer = retryTimer_;
 - (id)initWithURL:(NSURL *)url options:(NNSocketIOOptions*)options
 {
     TRACE();
@@ -115,8 +113,6 @@
     self.sessionId = nil;
     self.namespaces = nil;
     self.sendPacketBuffer = nil;
-    [self.retryTimer invalidate];
-    self.retryTimer = nil;
     self.websocket = nil;
     [super dealloc];
 
@@ -392,10 +388,10 @@ SHARED_STATE_METHOD();
 - (void)fail:(NNSocketIOSocket*)ctx error:(NSError *)error
 {
     TRACE();
+    [ctx changeState:[NNSocketIOSocketStateDisconnected sharedState]];
     if (ctx.options.retry && ctx.retryAttempts < ctx.options.retryMaxAttempts) {
         [self retry:ctx];
     } else {
-        [ctx changeState:[NNSocketIOSocketStateDisconnected sharedState]];
         [ctx didConnectFailed:error];
     }
 }
@@ -403,17 +399,20 @@ SHARED_STATE_METHOD();
 {
     TRACE();
     __block NNSocketIOSocket* ctx_ = ctx;
-    __block NNSocketIOSocketStateConnecting* self_ = self;
     if (ctx.retryAttempts > 0) {
-        ctx_.retryDelay *= 2;
+        NSTimeInterval d = ctx_.retryDelay * 2;
+        if (d > ctx.options.retryDelayLimit) {
+            d = ctx.options.retryDelayLimit;
+        }
+        ctx_.retryDelay = d;
     }
-    ctx.retryTimer = [NSTimer scheduledTimerWithTimeInterval:ctx.retryDelay block:^NSTimeInterval{
+    dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * ctx_.retryDelay);
+    dispatch_after(delay, dispatch_get_main_queue(), ^{
         if (ctx_.retryAttempts < NSUIntegerMax) {
             ctx_.retryAttempts++;
         }
-        [self_ handshake:ctx_];
-        return NNTimerBlockFinish;
-    }];
+        [ctx_ connect];
+    });
 }
 @end
 
@@ -424,8 +423,6 @@ SHARED_STATE_METHOD();
     TRACE();
     ctx.retryAttempts = 0;
     ctx.retryDelay = ctx.options.retryDelay;
-    [ctx.retryTimer invalidate];
-    ctx.retryTimer = nil;
     [ctx didConnect];
     if (ctx.sendPacketBuffer.count == 0) {
         return;
@@ -450,7 +447,7 @@ SHARED_STATE_METHOD();
         [self sendPacket:ctx packet:packet];
         return;
     } else if (type == NNSocketIOMessageTypeDisconnect && root) {
-        [self reconnect:ctx error:nil];
+        [ctx.websocket disconnect];
         return;
     }
     [ctx didReceivePacket:packet];

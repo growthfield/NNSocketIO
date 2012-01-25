@@ -22,7 +22,6 @@
     NSUInteger connectionRecoveryAttempts_;
     NSMutableArray* sendPacketBuffer;
     NNWebSocket* websocket_;
-    NSTimer* retryTimer_;
 }
 @property(nonatomic, retain) NNSocketIOOptions* options;
 @property(nonatomic, assign) BOOL secure;
