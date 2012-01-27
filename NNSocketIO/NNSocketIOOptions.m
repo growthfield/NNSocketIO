@@ -14,6 +14,7 @@
 @synthesize connectionRecoveryAttempts = connectionRecoveryAttempts_;
 @synthesize tlsSettings = tlsSettings_;
 @synthesize enableBackgroundingOnSocket = enableBackgroundingOnSocket_;
+@synthesize disconnectTimeout = disconnectTimeout_;
 + (id)options
 {
     TRACE();
@@ -34,6 +35,7 @@
         self.connectionRecovery = YES;
         self.connectionRecoveryAttempts = NSUIntegerMax;
         self.enableBackgroundingOnSocket = NO;
+        self.disconnectTimeout = 5;
     }
     return self;
 }
@@ -60,6 +62,7 @@
         o.connectionRecoveryAttempts = self.connectionRecoveryAttempts;
         o.tlsSettings = [[self.tlsSettings copyWithZone:zone] autorelease];
         o.enableBackgroundingOnSocket = self.enableBackgroundingOnSocket;
+        o.disconnectTimeout = self.disconnectTimeout;
     }
     return o;
 }

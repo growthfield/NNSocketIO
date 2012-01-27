@@ -28,6 +28,7 @@
 @property(nonatomic, retain) NSMutableArray* sendPacketBuffer;
 @property(nonatomic, assign) BOOL disconnectionClientInitiated;
 @property(nonatomic, retain) NSError* disconnectionReason;
+@property(nonatomic, retain) NNDispatch* disconnectTimeoutDispatch;
 - (void)connect;
 - (void)publish:(NSString*) eventName;
 - (void)publish:(NSString*) eventName args:(NNArgs*)args;
@@ -88,7 +89,8 @@
 @synthesize connectionRecoveryAttempts = connectionRecoveryAttempts_;
 @synthesize sendPacketBuffer = sendPacketBuffer_;
 @synthesize disconnectionClientInitiated = disconnectionClientInitiated_;
-@synthesize disconnectionReason = disconnectionReason;
+@synthesize disconnectionReason = disconnectionReason_;
+@synthesize disconnectTimeoutDispatch = disconnectTimeoutDispatch_;
 - (id)initWithURL:(NSURL *)url options:(NNSocketIOOptions*)options
 {
     TRACE();
@@ -296,6 +298,10 @@
 // Concrete state impls =================================================
 @implementation NNSocketIOSocketStateDisconnected
 SHARED_STATE_METHOD();
+- (void)didEnter:(NNSocketIOSocket *)ctx
+{
+    ctx.disconnectTimeoutDispatch = nil;
+}
 - (void)connect:(NNSocketIOSocket*)ctx
 {
     TRACE();
@@ -491,6 +497,18 @@ SHARED_STATE_METHOD();
 
 @implementation NNSocketIOSocketStateDisconnecting
 SHARED_STATE_METHOD();
+- (void)didEnter:(NNSocketIOSocket *)ctx
+{
+    __block NNSocketIOSocketStateDisconnecting* self_ = self;
+    __block NNSocketIOSocket* ctx_ = ctx;
+    dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * ctx.options.disconnectTimeout);
+    ctx.disconnectTimeoutDispatch = [NNDispatch dispatchAfter:delay queue:dispatch_get_main_queue() block:^{
+        TRACE();
+        NSError* error = [NSError errorWithDomain:NNSOCKETIO_ERROR_DOMAIN code:NNSocketIOErrorDisconnectTimeout userInfo:nil];
+        [self_ didClose:ctx_ error:error];
+    }];
+
+}
 - (void)didReceivePacket:(NNSocketIOSocket *)ctx packet:(NNSocketIOPacket *)packet
 {
     TRACE();
@@ -510,4 +528,9 @@ SHARED_STATE_METHOD();
     [ctx changeState:[NNSocketIOSocketStateDisconnected sharedState]];
     [ctx didDisconnect];
 }
+- (void)didExit:(NNSocketIOSocket*)ctx
+{
+    [ctx.disconnectTimeoutDispatch cancel];
+}
+
 @end

@@ -7,7 +7,8 @@ typedef enum {
     NNSocketIOErrorHandshakeHttpResponseCode = 100,
     NNSocketIOErrorHandshakeHttpResponseBody,
     NNSocketIOErrorUnexpectedDisconnection,
-    NNSocketIOErrorErrorPacket
+    NNSocketIOErrorErrorPacket,
+    NNSocketIOErrorDisconnectTimeout
 } NNSocketIOErrors;
 
 @interface NNSocketIO : NSObject

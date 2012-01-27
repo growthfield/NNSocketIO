@@ -4,6 +4,7 @@
 #import "NNSocketIONamespace.h"
 #import "NNSocketIOPacket.h"
 #import "NNWebSocket.h"
+#import "NNDispatch.h"
 
 @class NNSocketIOSocketState;
 
@@ -20,10 +21,11 @@
     NSTimeInterval retryDelay_;
     NSUInteger retryAttempts_;
     NSUInteger connectionRecoveryAttempts_;
-    NSMutableArray* sendPacketBuffer;
+    NSMutableArray* sendPacketBuffer_;
     NNWebSocket* websocket_;
     BOOL disconnectionClientInitiated_;
-    NSError* disconnectionReason;
+    NSError* disconnectionReason_;
+    NNDispatch* disconnectTimeoutDispatch_;
 }
 @property(nonatomic, retain) NNSocketIOOptions* options;
 @property(nonatomic, assign) BOOL secure;
