@@ -26,12 +26,20 @@
 @property(nonatomic, assign) NSUInteger retryAttempts;
 @property(nonatomic, assign) NSUInteger connectionRecoveryAttempts;
 @property(nonatomic, retain) NSMutableArray* sendPacketBuffer;
+@property(nonatomic, assign) BOOL disconnectionClientInitiated;
+@property(nonatomic, retain) NSError* disconnectionReason;
 - (void)connect;
 - (void)publish:(NSString*) eventName;
 - (void)publish:(NSString*) eventName args:(NNArgs*)args;
 - (void)changeState:(NNSocketIOSocketState*)newState;
-- (void)didReconnect;
 - (NNWebSocket*)createWebSocket:(NSString*)sessionId;
+- (void)didReconnect;
+- (void)didConnect;
+- (void)didConnectFailed:(NSError*)error;
+- (void)didDisconnect;
+- (void)didOpen;
+- (void)didClose:(NSError*)error;
+- (void)didReceivePacket:(NNSocketIOPacket*)packet;
 @end
 
 // Abstract states =================================================
@@ -40,7 +48,7 @@
 - (void)didExit:(NNSocketIOSocket*)ctx;
 - (void)didOpen:(NNSocketIOSocket*)ctx;
 - (void)didOpenFailed:(NNSocketIOSocket*)ctx error:(NSError*)error;
-- (void)didClose:(NNSocketIOSocket*)ctx clientInitiated:(BOOL)clientInitiated error:(NSError*)error;
+- (void)didClose:(NNSocketIOSocket*)ctx error:(NSError*)error;
 - (void)didReceivePacket:(NNSocketIOSocket*)ctx packet:(NNSocketIOPacket*)packet;
 - (void)connect:(NNSocketIOSocket*)ctx;
 - (void)disconnect:(NNSocketIOSocket*)ctx;
@@ -60,7 +68,6 @@
 @end
 @interface NNSocketIOSocketStateConnected : NNSocketIOSocketState
 + (id)sharedState;
-- (void)reconnect:(NNSocketIOSocket*)ctx error:(NSError*)error;
 @end
 @interface NNSocketIOSocketStateDisconnecting : NNSocketIOSocketState
 + (id)sharedState;
@@ -80,6 +87,8 @@
 @synthesize retryAttempts = retryAttempts_;
 @synthesize connectionRecoveryAttempts = connectionRecoveryAttempts_;
 @synthesize sendPacketBuffer = sendPacketBuffer_;
+@synthesize disconnectionClientInitiated = disconnectionClientInitiated_;
+@synthesize disconnectionReason = disconnectionReason;
 - (id)initWithURL:(NSURL *)url options:(NNSocketIOOptions*)options
 {
     TRACE();
@@ -170,10 +179,10 @@
         [self_.state didOpenFailed:self_ error:error];
     }];
     [websocket on:@"disconnect" listener:^(NNArgs* args) {
-        NSNumber* clientInitiated = [args get:0];
+        //NSNumber* clientInitiated = [args get:0];
         //NSNumber* status = [args get:1];
         NSError* error = [args get:2];
-        [self_.state didClose:self_ clientInitiated:[clientInitiated boolValue] error:error];
+        [self_.state didClose:self_ error:error];
     }];
     [websocket on:@"receive" listener:^(NNArgs* args) {
         NNWebSocketFrame* frame = [args get:0];
@@ -185,8 +194,6 @@
             [self_.state didReceivePacket:self_ packet:packet];
         }
     }];
-    [websocket connect];
-
     return websocket;
 }
 - (void)connect
@@ -241,13 +248,17 @@
         }
     }];
 }
-- (void)didDisconnect:(BOOL)clientInitiated error:(NSError*)error;
+- (void)didDisconnect
 {
     TRACE();
-    if (error) {
-        [self publish:@"error" args:[[NNArgs args] add:error]];
+    if (self.disconnectionReason) {
+        [self publish:@"error" args:[[NNArgs args] add:self.disconnectionReason]];
     }
     [self publish:@"disconnect"];
+    if (!self.disconnectionClientInitiated && self.options.connectionRecovery) {
+        self.connectionRecoveryAttempts++;
+        [self changeState:[NNSocketIOSocketStateConnecting sharedState]];
+    }
 }
 - (void)didOpen
 {
@@ -272,7 +283,7 @@
 - (void)didExit:(NNSocketIOSocket*)ctx{TRACE();}
 - (void)didOpen:(NNSocketIOSocket *)ctx{TRACE();}
 - (void)didOpenFailed:(NNSocketIOSocket*) ctx error:(NSError*)error{TRACE();}
-- (void)didClose:(NNSocketIOSocket*)ctx clientInitiated:(BOOL)clientInitiated error:(NSError*)error{TRACE();}
+- (void)didClose:(NNSocketIOSocket*)ctx error:(NSError*)error{TRACE();}
 - (void)didReceivePacket:(NNSocketIOSocket *)ctx packet:(NNSocketIOPacket *)packet{}
 - (void)connect:(NNSocketIOSocket*)ctx{TRACE();}
 - (void)disconnect:(NNSocketIOSocket*)ctx{TRACE();}
@@ -296,6 +307,8 @@ SHARED_STATE_METHOD();
 - (void)didEnter:(NNSocketIOSocket*)ctx
 {
     TRACE();
+    ctx.disconnectionClientInitiated = NO;
+    ctx.disconnectionReason = nil;
     [self handshake:ctx];
 }
 - (void)didOpen:(NNSocketIOSocket *)ctx
@@ -320,7 +333,7 @@ SHARED_STATE_METHOD();
     }  
     [ctx didReceivePacket:packet];
 }
-- (void)didClose:(NNSocketIOSocket*)ctx clientInitiated:(BOOL)clientInitiated error:(NSError*)error
+- (void)didClose:(NNSocketIOSocket*)ctx error:(NSError*)error
 {
     TRACE();
     [self fail:ctx error:error];
@@ -432,9 +445,11 @@ SHARED_STATE_METHOD();
     }
     [ctx.sendPacketBuffer removeAllObjects];
 }
-- (void)didClose:(NNSocketIOSocket*)ctx clientInitiated:(BOOL)clientInitiated error:(NSError*)error;{
+- (void)didClose:(NNSocketIOSocket*)ctx error:(NSError*)error;{
     TRACE();
-    [self reconnect:ctx error:error];
+    ctx.disconnectionReason = error;
+    [ctx changeState:[NNSocketIOSocketStateDisconnected sharedState]];
+    [ctx didDisconnect];
 }
 - (void)didReceivePacket:(NNSocketIOSocket *)ctx packet:(NNSocketIOPacket *)packet
 {
@@ -448,6 +463,7 @@ SHARED_STATE_METHOD();
         return;
     } else if (type == NNSocketIOMessageTypeDisconnect && root) {
         [ctx.websocket disconnect];
+        [ctx changeState:[NNSocketIOSocketStateDisconnecting sharedState]];
         return;
     }
     [ctx didReceivePacket:packet];
@@ -455,6 +471,12 @@ SHARED_STATE_METHOD();
 - (void)disconnect:(NNSocketIOSocket*)ctx
 {
     TRACE();
+    NNSocketIOPacket* packet = [NNSocketIOPacket packet:NNSocketIOMessageTypeDisconnect];
+    NSString* packetString = [NNSocketIOParser encodePacket:packet];
+    NNWebSocketFrame* frame = [NNWebSocketFrame frameText];
+    frame.payloadString = packetString;
+    [ctx.websocket send:frame];
+    ctx.disconnectionClientInitiated = YES;
     [ctx changeState:[NNSocketIOSocketStateDisconnecting sharedState]];
 }
 - (void)sendPacket:(NNSocketIOSocket *)ctx packet:(NNSocketIOPacket *)packet
@@ -465,35 +487,10 @@ SHARED_STATE_METHOD();
     frame.payloadString = packetString;
     [ctx.websocket send:frame];
 }
-- (void)reconnect:(NNSocketIOSocket *)ctx error:(NSError *)error
-{
-    TRACE();
-    [ctx changeState:[NNSocketIOSocketStateDisconnected sharedState]];
-    [ctx didDisconnect:false error:error];
-    if (ctx.options.connectionRecovery) {
-        ctx.connectionRecoveryAttempts++;
-        [ctx changeState:[NNSocketIOSocketStateConnecting sharedState]];
-    }
-}
 @end
 
 @implementation NNSocketIOSocketStateDisconnecting
 SHARED_STATE_METHOD();
-- (void)didEnter:(NNSocketIOSocket *)ctx
-{
-    TRACE();
-    NNSocketIOPacket* packet = [NNSocketIOPacket packet:NNSocketIOMessageTypeDisconnect];
-    NSString* packetString = [NNSocketIOParser encodePacket:packet];
-    NNWebSocketFrame* frame = [NNWebSocketFrame frameText];
-    frame.payloadString = packetString;
-    [ctx.websocket send:frame];
-}
-- (void)didClose:(NNSocketIOSocket*)ctx clientInitiated:(BOOL)clientInitiated error:(NSError*)error;
-{
-    TRACE();
-    [ctx changeState:[NNSocketIOSocketStateDisconnected sharedState]];
-    [ctx didDisconnect:true error:error];
-}
 - (void)didReceivePacket:(NNSocketIOSocket *)ctx packet:(NNSocketIOPacket *)packet
 {
     TRACE();
@@ -502,10 +499,15 @@ SHARED_STATE_METHOD();
     if (type == NNSocketIOMessageTypeHeartbeat) {
         return;
     } else if (type == NNSocketIOMessageTypeDisconnect && root) {
-        [ctx changeState:[NNSocketIOSocketStateDisconnected sharedState]];
-        [ctx didDisconnect:true error:nil];
+        [ctx.websocket disconnect];
         return;
     }
     [ctx didReceivePacket:packet];
+}
+- (void)didClose:(NNSocketIOSocket*)ctx error:(NSError*)error;{
+    TRACE();
+    ctx.disconnectionReason = error;
+    [ctx changeState:[NNSocketIOSocketStateDisconnected sharedState]];
+    [ctx didDisconnect];
 }
 @end

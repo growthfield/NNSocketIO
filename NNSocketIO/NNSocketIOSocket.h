@@ -22,6 +22,8 @@
     NSUInteger connectionRecoveryAttempts_;
     NSMutableArray* sendPacketBuffer;
     NNWebSocket* websocket_;
+    BOOL disconnectionClientInitiated_;
+    NSError* disconnectionReason;
 }
 @property(nonatomic, retain) NNSocketIOOptions* options;
 @property(nonatomic, assign) BOOL secure;
@@ -32,10 +34,4 @@
 - (NNSocketIONamespace*)of:(NSString*)name;
 - (void)sendPacket:(NNSocketIOPacket*)packet;
 - (void)disconnect;
-- (void)didConnect;
-- (void)didConnectFailed:(NSError*)error;
-- (void)didDisconnect:(BOOL)clientInitiated error:(NSError*)error;
-- (void)didOpen;
-- (void)didClose:(NSError*)error;
-- (void)didReceivePacket:(NNSocketIOPacket*)packet;
 @end

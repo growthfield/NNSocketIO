@@ -118,6 +118,8 @@
 		40FAB2EA14B3A3BC00760982 /* NNArgs.h in Headers */ = {isa = PBXBuildFile; fileRef = 40FAB2E814B3A3BB00760982 /* NNArgs.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		40FAB2EB14B3A3BC00760982 /* NNArgs.m in Sources */ = {isa = PBXBuildFile; fileRef = 40FAB2E914B3A3BC00760982 /* NNArgs.m */; };
 		40FFD4BD14CCE6DE008244C6 /* NNWebSocketOptions.h in Headers */ = {isa = PBXBuildFile; fileRef = 40520A0C14C155E900CAF5FA /* NNWebSocketOptions.h */; };
+		40FFD51714D21172008244C6 /* NNDispatch.h in Headers */ = {isa = PBXBuildFile; fileRef = 40FFD51514D21172008244C6 /* NNDispatch.h */; };
+		40FFD51814D21172008244C6 /* NNDispatch.m in Sources */ = {isa = PBXBuildFile; fileRef = 40FFD51614D21172008244C6 /* NNDispatch.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -327,6 +329,8 @@
 		40F754CB14B9527B0044A17D /* NNSocketIOClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NNSocketIOClient.h; sourceTree = "<group>"; };
 		40FAB2E814B3A3BB00760982 /* NNArgs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NNArgs.h; path = vendor/NNUtil/NNUtil/NNArgs.h; sourceTree = SOURCE_ROOT; };
 		40FAB2E914B3A3BC00760982 /* NNArgs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NNArgs.m; path = vendor/NNUtil/NNUtil/NNArgs.m; sourceTree = SOURCE_ROOT; };
+		40FFD51514D21172008244C6 /* NNDispatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NNDispatch.h; path = vendor/NNUtil/NNUtil/NNDispatch.h; sourceTree = SOURCE_ROOT; };
+		40FFD51614D21172008244C6 /* NNDispatch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NNDispatch.m; path = vendor/NNUtil/NNUtil/NNDispatch.m; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -458,6 +462,8 @@
 		409D9B9314418B30009F2852 /* NNUtil */ = {
 			isa = PBXGroup;
 			children = (
+				40FFD51514D21172008244C6 /* NNDispatch.h */,
+				40FFD51614D21172008244C6 /* NNDispatch.m */,
 				40F754BA14B79DB10044A17D /* NSString+NNUtil.h */,
 				40F754BB14B79DB10044A17D /* NSString+NNUtil.m */,
 				40F754BC14B79DB10044A17D /* NSTimer+NNUtil.h */,
@@ -678,6 +684,7 @@
 				40F754BE14B79DB10044A17D /* NSString+NNUtil.h in Headers */,
 				40F754C014B79DB10044A17D /* NSTimer+NNUtil.h in Headers */,
 				40BB883E14CB66130025A89A /* NNSocketIODebug.h in Headers */,
+				40FFD51714D21172008244C6 /* NNDispatch.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -795,6 +802,7 @@
 				40F754BF14B79DB10044A17D /* NSString+NNUtil.m in Sources */,
 				40F754C114B79DB10044A17D /* NSTimer+NNUtil.m in Sources */,
 				40520A0F14C155E900CAF5FA /* NNWebSocketOptions.m in Sources */,
+				40FFD51814D21172008244C6 /* NNDispatch.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
