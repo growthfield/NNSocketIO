@@ -3,8 +3,8 @@
 #import "NNSocketIOParser.h"
 #import "NNSocketIODebug.h"
 #import "NNSocketIONamespace.h"
-#import "NSTimer+NNUtil.h"
 #import "NNWebSocket.h"
+#import "NNReachability.h"
 
 #define SHARED_STATE_METHOD() \
 + (NNSocketIOSocketState*)sharedState \
@@ -29,6 +29,7 @@
 @property(nonatomic, assign) BOOL disconnectionClientInitiated;
 @property(nonatomic, retain) NSError* disconnectionReason;
 @property(nonatomic, retain) NNDispatch* disconnectTimeoutDispatch;
+@property(nonatomic, assign) BOOL isNetworkAvailable;
 - (void)connect;
 - (void)publish:(NSString*) eventName;
 - (void)publish:(NSString*) eventName args:(NNArgs*)args;
@@ -41,6 +42,7 @@
 - (void)didOpen;
 - (void)didClose:(NSError*)error;
 - (void)didReceivePacket:(NNSocketIOPacket*)packet;
+- (void)didChangeNetworkReachability:(NSNotification*)notification;
 @end
 
 // Abstract states =================================================
@@ -91,11 +93,13 @@
 @synthesize disconnectionClientInitiated = disconnectionClientInitiated_;
 @synthesize disconnectionReason = disconnectionReason_;
 @synthesize disconnectTimeoutDispatch = disconnectTimeoutDispatch_;
+@synthesize isNetworkAvailable = isNetworkAvailable_;
 - (id)initWithURL:(NSURL *)url options:(NNSocketIOOptions*)options
 {
     TRACE();
     self = [super init];
     if (self) {
+        self.isNetworkAvailable = YES;
         self.state = [NNSocketIOSocketStateDisconnected sharedState];
         self.namespaces = [NSMutableDictionary dictionary];
         self.options = options;
@@ -111,6 +115,7 @@
         self.retryDelay = options.retryDelay;
         self.retryAttempts = 0;
         self.sendPacketBuffer= [NSMutableArray array];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didChangeNetworkReachability:) name:NNREACHABILITY_CHANGED_NOTIFICATION object:nil];
         [self connect];
     }
     TRACE(@"socket created %@", self);
@@ -257,8 +262,10 @@
         [self publish:@"error" args:[[NNArgs args] add:self.disconnectionReason]];
     }
     [self publish:@"disconnect"];
-    if (!self.disconnectionClientInitiated && self.options.connectionRecovery) {
-        self.connectionRecoveryAttempts++;
+    if (!self.disconnectionClientInitiated && self.options.connectionRecovery && self.isNetworkAvailable) {
+        if (self.connectionRecoveryAttempts < NSUIntegerMax) {
+            self.connectionRecoveryAttempts++;
+        }
         [self changeState:[NNSocketIOSocketStateConnecting sharedState]];
     }
 }
@@ -276,6 +283,16 @@
 {
     TRACE();
     [[self of:packet.endpoint] onPacket:packet];
+}
+- (void)didChangeNetworkReachability:(NSNotification*)notification
+{
+    NNReachability* reachability = notification.object;
+    BOOL available = reachability.isNetworkAvailable;
+    TRACE(@"reachability has changed. %@", available ? @"available" : @"not available");
+    self.isNetworkAvailable = available;
+    if (available && self.state == [NNSocketIOSocketStateDisconnected sharedState] && !self.disconnectionClientInitiated) {
+        [self connect];
+    }
 }
 @end
 
@@ -408,7 +425,7 @@ SHARED_STATE_METHOD();
 {
     TRACE();
     [ctx changeState:[NNSocketIOSocketStateDisconnected sharedState]];
-    if (ctx.options.retry && ctx.retryAttempts < ctx.options.retryMaxAttempts) {
+    if (ctx.options.retry && ctx.retryAttempts < ctx.options.retryMaxAttempts && ctx.isNetworkAvailable) {
         [self retry:ctx];
     } else {
         [ctx didConnectFailed:error];

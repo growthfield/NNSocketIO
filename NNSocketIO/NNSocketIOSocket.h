@@ -26,6 +26,7 @@
     BOOL disconnectionClientInitiated_;
     NSError* disconnectionReason_;
     NNDispatch* disconnectTimeoutDispatch_;
+    BOOL isNetworkAvailable_;
 }
 @property(nonatomic, retain) NNSocketIOOptions* options;
 @property(nonatomic, assign) BOOL secure;
