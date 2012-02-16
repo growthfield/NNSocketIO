@@ -262,11 +262,13 @@
         [self publish:@"error" args:[[NNArgs args] add:self.disconnectionReason]];
     }
     [self publish:@"disconnect"];
-    if (!self.disconnectionClientInitiated && self.options.connectionRecovery && self.isNetworkAvailable) {
+    if (!self.disconnectionClientInitiated && self.options.connectionRecovery) {
         if (self.connectionRecoveryAttempts < NSUIntegerMax) {
             self.connectionRecoveryAttempts++;
         }
-        [self changeState:[NNSocketIOSocketStateConnecting sharedState]];
+        if (self.isNetworkAvailable) {
+            [self changeState:[NNSocketIOSocketStateConnecting sharedState]];
+        }
     }
 }
 - (void)didOpen
