@@ -367,7 +367,7 @@ SHARED_STATE_METHOD();
 {
     TRACE();
     __block NNSocketIOSocket* ctx_ = ctx;
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSMutableString* u = nil;
         NSURL* url = nil;
         // Handshake
@@ -384,37 +384,39 @@ SHARED_STATE_METHOD();
         NSHTTPURLResponse* res = nil;
         NSError* error = nil;
         NSData* result = [NSURLConnection sendSynchronousRequest:req returningResponse:&res error:&error];
-        if (error) {
-            [self fail:ctx error:error];
-            return;
-        }
-        if (res.statusCode != 200) {
-            TRACE(@"http status %d", res.statusCode);
-            [self failWithCode:ctx_ code:NNSocketIOErrorHandshakeHttpResponseCode];
-            return;
-        }
-        NSString* str = [[[NSString alloc] initWithData:result encoding:NSASCIIStringEncoding] autorelease];
-        NSArray* array = [str componentsSeparatedByString:@":"];
-        if ([array count] < 3) {
-            [self failWithCode:ctx_ code:NNSocketIOErrorHandshakeHttpResponseBody];
-            return;
-        }
-        NSString* sessionId = [array objectAtIndex:0];
-        NSString* heartbeatTimeout = [array objectAtIndex:1];
-        NSString* closeTimeout = [array objectAtIndex:2];
-        if ([sessionId length] == 0) {
-            [self failWithCode:ctx_ code:NNSocketIOErrorHandshakeHttpResponseBody];
-            return;
-        }
-        if ([heartbeatTimeout length] == 0) {
-            [self failWithCode:ctx_ code:NNSocketIOErrorHandshakeHttpResponseBody];
-        }
-        if ([closeTimeout length] == 0) {
-            [self failWithCode:ctx_ code:NNSocketIOErrorHandshakeHttpResponseBody];
-            return;
-        }
-        NNWebSocket* websocket = [ctx_ createWebSocket:sessionId];
-        [websocket connect];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (error) {
+                [self fail:ctx error:error];
+                return;
+            }
+            if (res.statusCode != 200) {
+                TRACE(@"http status %d", res.statusCode);
+                [self failWithCode:ctx_ code:NNSocketIOErrorHandshakeHttpResponseCode];
+                return;
+            }
+            NSString* str = [[[NSString alloc] initWithData:result encoding:NSASCIIStringEncoding] autorelease];
+            NSArray* array = [str componentsSeparatedByString:@":"];
+            if ([array count] < 3) {
+                [self failWithCode:ctx_ code:NNSocketIOErrorHandshakeHttpResponseBody];
+                return;
+            }
+            NSString* sessionId = [array objectAtIndex:0];
+            NSString* heartbeatTimeout = [array objectAtIndex:1];
+            NSString* closeTimeout = [array objectAtIndex:2];
+            if ([sessionId length] == 0) {
+                [self failWithCode:ctx_ code:NNSocketIOErrorHandshakeHttpResponseBody];
+                return;
+            }
+            if ([heartbeatTimeout length] == 0) {
+                [self failWithCode:ctx_ code:NNSocketIOErrorHandshakeHttpResponseBody];
+            }
+            if ([closeTimeout length] == 0) {
+                [self failWithCode:ctx_ code:NNSocketIOErrorHandshakeHttpResponseBody];
+                return;
+            }
+            NNWebSocket* websocket = [ctx_ createWebSocket:sessionId];
+            [websocket connect];
+        });
     });
 }
 - (void)failWithCode:(NNSocketIOSocket*)ctx code:(NNSocketIOErrors)code
