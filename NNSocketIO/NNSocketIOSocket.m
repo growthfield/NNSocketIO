@@ -174,7 +174,7 @@
     NNWebSocketOptions* wsopts = [NNWebSocketOptions options];
     wsopts.enableBackgroundingOnSocket = self.options.enableBackgroundingOnSocket;
     wsopts.tlsSettings = self.options.tlsSettings;
-    NNWebSocket* websocket = [[[NNWebSocket alloc] initWithURL:url origin:nil protocols:nil options:wsopts] autorelease];
+    NNWebSocket* websocket = [[[NNWebSocket alloc] initWithURL:url origin:self.options.origin protocols:nil options:wsopts] autorelease];
     self.websocket = websocket;
     self.sessionId = sessionId;
     __block NNSocketIOSocket* self_ = self;
@@ -380,6 +380,9 @@ SHARED_STATE_METHOD();
         NSMutableURLRequest* req = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:ctx_.options.connectTimeout];
         [req setHTTPMethod:@"POST"];
         [req setHTTPShouldHandleCookies:YES];
+        if (ctx_.options.origin) {
+            [req addValue:ctx_.options.origin forHTTPHeaderField:@"Origin"];
+        }
         //[req setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"content-type"];
         NSHTTPURLResponse* res = nil;
         NSError* error = nil;

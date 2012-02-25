@@ -15,6 +15,8 @@
 @synthesize tlsSettings = tlsSettings_;
 @synthesize enableBackgroundingOnSocket = enableBackgroundingOnSocket_;
 @synthesize disconnectTimeout = disconnectTimeout_;
+@synthesize origin = origin_;
+
 + (id)options
 {
     TRACE();
@@ -44,6 +46,7 @@
     TRACE();
     self.resource = nil;
     self.tlsSettings = nil;
+    self.origin = nil;
     [super dealloc];
 }
 - (id)copyWithZone:(NSZone *)zone
@@ -63,6 +66,7 @@
         o.tlsSettings = [[self.tlsSettings copyWithZone:zone] autorelease];
         o.enableBackgroundingOnSocket = self.enableBackgroundingOnSocket;
         o.disconnectTimeout = self.disconnectTimeout;
+        o.origin = [[self.origin copyWithZone:zone] autorelease];
     }
     return o;
 }

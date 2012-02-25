@@ -16,6 +16,7 @@
     NSDictionary* tlsSettings_;
     BOOL enableBackgroundingOnSocket_;
     NSTimeInterval disconnectTimeout_;
+    NSString* origin_;
 }
 @property(nonatomic, retain) NSString* resource;
 @property(nonatomic, assign) NSUInteger protocolVersion;
@@ -29,5 +30,6 @@
 @property(nonatomic, retain) NSDictionary* tlsSettings;
 @property(nonatomic, assign) BOOL enableBackgroundingOnSocket;
 @property(nonatomic, assign) NSTimeInterval disconnectTimeout;
+@property(nonatomic, retain) NSString* origin;
 + (id)options;
 @end
