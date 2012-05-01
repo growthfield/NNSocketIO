@@ -1,7 +1,10 @@
 # NNSocketIO
 
 NNSocketIO is socket.io client clone for iOS.  
-Currently, This library is not tested enough and it only be tested on iPhone simulator with socket.io 0.8.7
+
+## License
+
+Apache License, Version 2.0
 
 ## Usage example
 
